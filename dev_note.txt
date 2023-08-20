@@ -1,0 +1,10 @@
+
+Appwrite docker info
+--------------------------
+secret key: appwrite@lemonlist
+hostname: localhost
+DNS A records hostname: localhost
+account email: suresh.majhi.cse@gmail.com
+password: myAppwrite@8123
+
+

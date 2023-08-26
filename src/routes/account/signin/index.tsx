@@ -1,11 +1,9 @@
-import { $, component$, useTask$ } from "@builder.io/qwik";
-import { routeLoader$, z, RequestEvent } from "@builder.io/qwik-city";
+import { $, component$ } from "@builder.io/qwik";
+import { routeLoader$, z } from "@builder.io/qwik-city";
 import type { DocumentHead } from "@builder.io/qwik-city";
-import { Link, useNavigate, routeAction$ } from "@builder.io/qwik-city";
+import { Link } from "@builder.io/qwik-city";
 import type { InitialValues, SubmitHandler } from "@modular-forms/qwik";
 import { formAction$, useForm, zodForm$ } from "@modular-forms/qwik";
-// import { account } from "~/appwrite.config";
-// import { type RequestHandler } from "@builder.io/qwik-city";
 import * as setCookie from "set-cookie-parser";
 import {
   AppwriteEndpoint,
@@ -104,7 +102,7 @@ export const useFormAction = formAction$<LoginForm>(
   zodForm$(loginSchema)
 );
 
-export const useAccountLoader = routeLoader$(async ({ cookie }) => {
+export const useAccountLoader = routeLoader$(async ({ cookie, redirect }) => {
   const sessionNames = [
     "a_session_" + AppwriteProject.toLowerCase(),
     "a_session_" + AppwriteProject.toLowerCase() + "_legacy",
@@ -148,14 +146,10 @@ export const useAccountLoader = routeLoader$(async ({ cookie }) => {
     account = null;
   }
 
-  return {
-    account,
-  };
+  if (account?.$id) {
+    throw redirect(307, "/dashboard");
+  }
 });
-
-// const navigationToPage = (nav: any, pageRoute: string) => {
-//   $(nav(pageRoute));
-// };
 
 export default component$(() => {
   const [loginForm, { Form, Field }] = useForm<LoginForm>({
@@ -164,32 +158,7 @@ export default component$(() => {
     validate: zodForm$(loginSchema),
   });
 
-  const nav = useNavigate();
-
   console.log("loginForm Result: ", loginForm);
-
-  const account = useAccountLoader();
-  console.log("user account info1: ", account);
-  console.log("user account info2: ", account.value);
-  console.log("user account info3: ", account.value?.account?.$id);
-
-  let sid: string = "";
-  if (account.value?.account?.$id) {
-    sid = account.value.account.$id;
-  }
-  console.log("sid: ", sid);
-
-  useTask$(({ track }) => {
-    track(() => sid);
-
-    if (sid != "") {
-      nav("/dashboard");
-    }
-  });
-
-  // if (sid != "") {
-  //   navigationToPage(nav, "/dashboard");
-  // }
 
   type signinFormData = {
     email: string;
